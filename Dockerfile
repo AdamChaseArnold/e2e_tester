@@ -9,23 +9,30 @@ COPY package*.json ./
 COPY frontend/package*.json ./frontend/
 COPY backend/package*.json ./backend/
 
-# Install dependencies
-RUN npm ci --only=production
-RUN cd frontend && npm ci --only=production
-RUN cd backend && npm ci --only=production
+# Install dependencies as root
+RUN npm ci && \
+    cd frontend && npm ci && \
+    cd ../backend && npm ci && \
+    cd .. && npm ci
 
 # Copy source code
 COPY . .
 
-# Build React frontend
-RUN cd frontend && npm run build
-
 # Install Playwright browsers
 RUN npx playwright install --with-deps
 
+# Build React frontend
+RUN cd frontend && npm run build
+
 # Create non-root user for security
 RUN groupadd -r appuser && useradd -r -g appuser -m appuser
+
+# Set permissions
 RUN chown -R appuser:appuser /app
+RUN chmod -R 755 /app/node_modules
+RUN chmod -R 755 /app/frontend/node_modules
+RUN chmod -R 755 /app/backend/node_modules
+
 USER appuser
 
 # Expose ports
