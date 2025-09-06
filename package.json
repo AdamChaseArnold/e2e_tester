@@ -1,0 +1,19 @@
+{
+  "name": "hello-world-fullstack",
+  "version": "1.0.0",
+  "description": "Hello World app with React frontend, Express backend, and Playwright testing",
+  "scripts": {
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "playwright": "^1.40.0",
+    "concurrently": "^8.2.2"
+  }
+}
