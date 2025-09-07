@@ -36,7 +36,24 @@ hello-world-app/
 
 - Node.js 18+
 - npm or yarn
-- Docker (optional)
+- Docker 20.10+ and Docker Compose v2+
+
+### Important Configuration Requirements
+
+1. **Docker Services Separation**
+   - Frontend and backend must run as separate services
+   - Each service needs its own volume mounts for node_modules
+   - Services must start in order: backend → frontend → tests
+
+2. **Dependencies Installation**
+   - Each service (frontend/backend) requires its own npm install
+   - Dependencies must be installed in the correct directory structure
+   - Node modules must have correct permissions (755)
+
+3. **Network Configuration**
+   - Backend must expose port 5000
+   - Frontend must expose port 3000
+   - Services must wait for dependent services to be healthy
 
 ### Installation
 
@@ -72,22 +89,58 @@ Run tests in headed mode:
 npm test:headed
 ```
 
-### Docker
+### Docker Setup
 
-Build and run with Docker:
+1. **Build and Start Services**
 ```bash
-docker build -t hello-world-app .
-docker run -p 3000:3000 -p 5000:5000 hello-world-app
+# Build images
+docker-compose build
+
+# Start services in correct order
+docker-compose up -d backend
+sleep 5  # Wait for backend to initialize
+docker-compose up -d frontend
 ```
 
-Or use Docker Compose:
+2. **Verify Services**
 ```bash
-docker-compose up
+# Check backend health
+curl http://localhost:5000/health
+
+# Check frontend is responding
+curl http://localhost:3000
 ```
 
-Run tests with Docker Compose:
+3. **Run Tests**
 ```bash
+# Run tests after services are healthy
 docker-compose --profile test up
+```
+
+### Troubleshooting
+
+1. **Permission Issues**
+```bash
+# Fix node_modules permissions
+docker-compose exec backend chmod -R 755 /app/node_modules
+docker-compose exec frontend chmod -R 755 /app/node_modules
+```
+
+2. **Service Health Checks**
+```bash
+# View service logs
+docker-compose logs -f
+
+# Check service status
+docker-compose ps
+```
+
+3. **Dependencies Issues**
+```bash
+# Rebuild node_modules
+docker-compose down -v
+docker-compose build --no-cache
+docker-compose up -d
 ```
 
 ## 🧪 What's Tested
