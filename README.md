@@ -1,14 +1,12 @@
 # E2E Tester Application
 
-A complete full-stack application with React frontend, Express backend, and Playwright testing, all containerized with Docker.
+A complete full-stack application with React frontend, Express backend, and Playwright testing. This application runs directly on your local machine without containerization for easier development and testing.
 
 ## 🚀 Features
 
 - **React 18** frontend with modern hooks and components
 - **Express.js** backend with CORS, security middleware, and API endpoints
 - **Playwright** end-to-end testing with multiple browser support
-- **Docker** containerization with multi-stage builds
-- **Docker Compose** for easy development and testing
 
 ## 📁 Project Structure
 
@@ -24,8 +22,8 @@ e2e-tester/
 │   └── package.json
 ├── tests/             # Playwright tests
 │   └── url-navigation.spec.js
-├── Dockerfile
-├── docker-compose.yml
+├── scripts/           # Utility scripts
+│   └── local-health-check.sh
 ├── playwright.config.js
 └── package.json
 ```
@@ -36,14 +34,13 @@ e2e-tester/
 
 - Node.js 18+
 - npm or yarn
-- Docker 20.10+ and Docker Compose v2+
 
 ### Important Configuration Requirements
 
-1. **Docker Services Separation**
-   - Frontend and backend must run as separate services
-   - Each service needs its own volume mounts for node_modules
-   - Services must start in order: backend → frontend → tests
+1. **Service Separation**
+   - Frontend and backend run as separate services
+   - Each service has its own dependencies
+   - Services should start in order: backend → frontend → tests
 
 2. **Dependencies Installation**
    - Each service (frontend/backend) requires its own npm install
@@ -51,8 +48,8 @@ e2e-tester/
    - Node modules must have correct permissions (755)
 
 3. **Network Configuration**
-   - Backend must expose port 5000
-   - Frontend must expose port 3000
+   - Backend runs on port 5001
+   - Frontend runs on port 3000
    - Services must wait for dependent services to be healthy
 
 ### Installation
@@ -68,7 +65,7 @@ npm start
 ```
 
 This will start:
-- Backend server on http://localhost:5000
+- Backend server on http://localhost:5001
 - Frontend server on http://localhost:3000
 
 ### API Endpoints
@@ -89,23 +86,22 @@ Run tests in headed mode:
 npm test:headed
 ```
 
-### Docker Setup
+### Local Setup
 
-1. **Build and Start Services**
+1. **Start Services**
 ```bash
-# Build images
-docker-compose build
+# Start both services with a single command
+./run-local.sh
 
-# Start services in correct order
-docker-compose up -d backend
-sleep 5  # Wait for backend to initialize
-docker-compose up -d frontend
+# Or start services individually
+./run-backend-local.sh
+./run-frontend-local.sh
 ```
 
 2. **Verify Services**
 ```bash
 # Check backend health
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 
 # Check frontend is responding
 curl http://localhost:3000
@@ -114,33 +110,32 @@ curl http://localhost:3000
 3. **Run Tests**
 ```bash
 # Run tests after services are healthy
-docker-compose --profile test up
+npm test
 ```
 
 ### Troubleshooting
 
-1. **Permission Issues**
+1. **Port Conflicts**
 ```bash
-# Fix node_modules permissions
-docker-compose exec backend chmod -R 755 /app/node_modules
-docker-compose exec frontend chmod -R 755 /app/node_modules
+# Check if ports are in use
+lsof -i :5001
+lsof -i :3000
+
+# Kill processes using those ports
+fuser -k 5001/tcp
+fuser -k 3000/tcp
 ```
 
 2. **Service Health Checks**
 ```bash
-# View service logs
-docker-compose logs -f
-
-# Check service status
-docker-compose ps
+# Run the health check script
+./scripts/local-health-check.sh
 ```
 
 3. **Dependencies Issues**
 ```bash
-# Rebuild node_modules
-docker-compose down -v
-docker-compose build --no-cache
-docker-compose up -d
+# Reinstall dependencies
+npm run install:all
 ```
 
 ## 🧪 What's Tested
@@ -157,7 +152,6 @@ The Playwright tests cover:
 - Frontend: React with Create React App
 - Backend: Express with security middleware
 - Testing: Playwright for E2E tests
-- Containerization: Docker with Playwright base image
 
 ## 📝 License
 

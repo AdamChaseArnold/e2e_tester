@@ -7,12 +7,13 @@
     "start:backend": "cd backend && npm start",
     "start:frontend": "cd frontend && npm start",
     "build": "cd frontend && npm run build",
-    "test": "npm run verify-setup && playwright test",
-    "test:headed": "npm run verify-setup && playwright test --headed",
+    "test": "npm run verify && playwright test",
+    "test:headed": "npm run verify && playwright test --headed",
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
-    "verify-setup": "./scripts/health-check.sh",
-    "docker:start": "docker-compose up -d backend && sleep 5 && docker-compose up -d frontend",
-    "docker:test": "npm run verify-setup && docker-compose --profile test up"
+    "verify": "./scripts/local-health-check.sh",
+    "start:local": "./run-local.sh",
+    "start:backend:local": "./run-backend-local.sh",
+    "start:frontend:local": "./run-frontend-local.sh"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",

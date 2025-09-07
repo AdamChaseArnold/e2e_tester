@@ -6,7 +6,7 @@ const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(helmet());
@@ -53,9 +53,12 @@ app.post('/api/check-url', async (req, res) => {
     const targetUrl = url.startsWith('http') ? url : `https://${url}`;
     console.log('Checking URL:', targetUrl);
     
+    // Add detailed debugging
+    console.log('Starting URL check with axios...');
+    
     const response = await axios.get(targetUrl, { 
-      timeout: 10000,
-      validateStatus: null,
+      timeout: 15000,
+      validateStatus: null, // Accept any status code
       maxRedirects: 5,
       headers: {
         'Accept': '*/*',
@@ -63,15 +66,35 @@ app.post('/api/check-url', async (req, res) => {
       }
     });
     
-    console.log('Response status:', response.status);
+    console.log('Response received:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
+      dataLength: response.data ? (typeof response.data === 'string' ? response.data.length : 'not a string') : 'no data'
+    });
     
-    // Any response indicates the URL is accessible
+    // Always return success for any response
     const result = { success: true, message: 'URL is accessible' };
-    console.log('Sending response:', result);
-    res.json(result);
+    console.log('Sending success response:', result);
+    return res.json(result);
   } catch (error) {
     console.error('Error accessing URL:', error.message);
-    res.json({ success: false, message: 'URL is not accessible' });
+    console.error('Error details:', {
+      code: error.code,
+      errno: error.errno,
+      syscall: error.syscall,
+      hostname: error.hostname,
+      path: error.path,
+      config: error.config ? {
+        url: error.config.url,
+        method: error.config.method,
+        timeout: error.config.timeout
+      } : 'no config'
+    });
+    
+    // Process all URLs the same way without special cases
+    
+    return res.json({ success: false, message: 'URL is not accessible' });
   }
 });
 

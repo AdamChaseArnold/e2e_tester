@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './index.css';
 
-// Configure axios defaults
-axios.defaults.baseURL = 'http://localhost:5000';
-axios.defaults.timeout = 10000;
+// Configure axios defaults for local environment
+// No need to set baseURL when using proxy in package.json
+axios.defaults.timeout = 15000;
 axios.defaults.headers.common['Accept'] = 'application/json';
 
 function App() {
@@ -29,17 +29,34 @@ function App() {
             setStatus(null);
 
             try {
-              const response = await axios.post('/api/check-url', { url: inputValue });
-              console.log('API Response:', response.data);
+              // Use relative URL with proxy configuration
+              console.log('Sending request to API...');
               
+              const response = await axios({
+                method: 'post',
+                url: '/api/check-url',
+                data: { url: inputValue },
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
+                }
+              });
+              
+              console.log('API Response received:', response.data);
+              
+              // Process all URLs the same way
               if (response.data && response.data.success) {
                 setStatus({ success: true, message: 'URL is accessible' });
               } else {
                 setStatus({ success: false, message: 'URL is not accessible' });
               }
             } catch (error) {
-              console.error('Error checking URL:', error.message);
-              setStatus({ success: false, message: 'URL is not accessible' });
+              console.error('Error checking URL:', error);
+              
+              // Handle all URLs the same way on error
+              {
+                setStatus({ success: false, message: 'URL is not accessible' });
+              }
             } finally {
               setLoading(false);
             }
