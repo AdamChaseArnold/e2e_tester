@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './index.css';
 
+// Configure axios defaults
+axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.timeout = 10000;
+axios.defaults.headers.common['Accept'] = 'application/json';
+
 function App() {
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -24,15 +29,16 @@ function App() {
             setStatus(null);
 
             try {
-              const response = await axios.post('http://localhost:5000/api/check-url', {
-                url: inputValue
-              });
-              if (response.data.success) {
+              const response = await axios.post('/api/check-url', { url: inputValue });
+              console.log('API Response:', response.data);
+              
+              if (response.data && response.data.success) {
                 setStatus({ success: true, message: 'URL is accessible' });
               } else {
                 setStatus({ success: false, message: 'URL is not accessible' });
               }
             } catch (error) {
+              console.error('Error checking URL:', error.message);
               setStatus({ success: false, message: 'URL is not accessible' });
             } finally {
               setLoading(false);

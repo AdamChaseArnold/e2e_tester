@@ -1,40 +1,43 @@
-version: '3.8'
-
 services:
   frontend:
-    build: .
+    build:
+      context: .
+      target: frontend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=development
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/frontend/node_modules
-    command: npm run start:frontend
+      - NODE_ENV=production
 
   backend:
-    build: .
+    build:
+      context: .
+      target: backend
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
     environment:
-      - NODE_ENV=development
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/backend/node_modules
-    command: npm run start:backend
+      - NODE_ENV=production
+    healthcheck:
+      test: wget -q --spider http://localhost:5000/health || exit 1
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
 
   test:
-    build: .
+    build:
+      context: .
+      target: test
+      dockerfile: Dockerfile
     volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/frontend/node_modules
-      - /app/backend/node_modules
+      - ./tests:/app/tests
+      - ./playwright.config.js:/app/playwright.config.js
     command: npm test
     depends_on:
-      - frontend
-      - backend
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_started
     profiles:
       - test

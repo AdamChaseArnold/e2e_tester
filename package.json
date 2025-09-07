@@ -1,7 +1,7 @@
 {
-  "name": "hello-world-fullstack",
+  "name": "e2e-tester",
   "version": "1.0.0",
-  "description": "Hello World app with React frontend, Express backend, and Playwright testing",
+  "description": "E2E testing application with React frontend, Express backend, and Playwright testing",
   "scripts": {
     "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "start:backend": "cd backend && npm start",

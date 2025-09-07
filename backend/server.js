@@ -25,32 +25,37 @@ app.use(express.json());
 
 // Routes
 app.get('/', (req, res) => {
-  res.json({ message: 'Hello World from Express Backend!' });
+  res.json({ message: 'E2E Tester Backend API' });
 });
 
 app.get('/api/hello', (req, res) => {
   res.json({ 
-    message: 'Hello World API!',
+    message: 'E2E Tester API',
     timestamp: new Date().toISOString(),
     status: 'success'
   });
 });
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'healthy', service: 'hello-world-backend' });
+  res.json({ status: 'healthy', service: 'e2e-tester-backend' });
 });
 
 app.post('/api/check-url', async (req, res) => {
+  console.log('Received URL check request:', req.body);
   const { url } = req.body;
+  
   if (!url) {
+    console.log('No URL provided');
     return res.status(400).json({ success: false, message: 'URL is required' });
   }
 
   try {
     const targetUrl = url.startsWith('http') ? url : `https://${url}`;
+    console.log('Checking URL:', targetUrl);
+    
     const response = await axios.get(targetUrl, { 
       timeout: 10000,
-      validateStatus: (status) => status >= 200 && status < 400,
+      validateStatus: null,
       maxRedirects: 5,
       headers: {
         'Accept': '*/*',
@@ -58,7 +63,12 @@ app.post('/api/check-url', async (req, res) => {
       }
     });
     
-    res.json({ success: true, message: 'URL is accessible' });
+    console.log('Response status:', response.status);
+    
+    // Any response indicates the URL is accessible
+    const result = { success: true, message: 'URL is accessible' };
+    console.log('Sending response:', result);
+    res.json(result);
   } catch (error) {
     console.error('Error accessing URL:', error.message);
     res.json({ success: false, message: 'URL is not accessible' });

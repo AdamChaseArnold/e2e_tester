@@ -1,4 +1,4 @@
-# Hello World Full Stack App
+# E2E Tester Application
 
 A complete full-stack application with React frontend, Express backend, and Playwright testing, all containerized with Docker.
 
@@ -13,7 +13,7 @@ A complete full-stack application with React frontend, Express backend, and Play
 ## 📁 Project Structure
 
 ```
-hello-world-app/
+e2e-tester/
 ├── frontend/          # React application
 │   ├── public/
 │   ├── src/
@@ -23,7 +23,7 @@ hello-world-app/
 │   ├── .env
 │   └── package.json
 ├── tests/             # Playwright tests
-│   └── hello-world.spec.js
+│   └── url-navigation.spec.js
 ├── Dockerfile
 ├── docker-compose.yml
 ├── playwright.config.js

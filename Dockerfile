@@ -1,46 +1,57 @@
-# Use official Playwright image as base
-FROM mcr.microsoft.com/playwright:v1.40.0-jammy
+# Stage 1: Frontend build
+FROM node:18-alpine AS frontend-builder
+WORKDIR /app
+# Only copy package files first for better caching
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
 
-# Set working directory
+# Stage 2: Backend build
+FROM node:18-alpine AS backend-builder
+WORKDIR /app
+COPY backend/package*.json ./
+RUN npm ci --only=production
+COPY backend/ ./
+
+# Stage 3: Test environment (only when needed)
+FROM mcr.microsoft.com/playwright:v1.40.0-jammy AS test
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY tests/ ./tests/
+COPY playwright.config.js ./
+RUN npx playwright install chromium
+
+# Stage 4: Frontend static server
+FROM nginx:alpine AS frontend
+COPY --from=frontend-builder /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 3000
+CMD ["nginx", "-g", "daemon off;"]
+
+# Stage 5: Backend production
+FROM node:18-alpine AS backend
 WORKDIR /app
 
-# Copy package files first for better caching
-COPY package*.json ./
-COPY frontend/package*.json ./frontend/
-COPY backend/package*.json ./backend/
+# Install production dependencies
+COPY backend/package*.json ./
+RUN npm ci --only=production && \
+    npm cache clean --force
 
-# Install dependencies as root
-RUN npm ci && \
-    cd frontend && npm ci && \
-    cd ../backend && npm ci && \
-    cd .. && npm ci
+# Copy backend files
+COPY --from=backend-builder /app/ ./
 
-# Copy source code
-COPY . .
-
-# Install Playwright browsers
-RUN npx playwright install --with-deps
-
-# Build React frontend
-RUN cd frontend && npm run build
-
-# Create non-root user for security
-RUN groupadd -r appuser && useradd -r -g appuser -m appuser
-
-# Set permissions
-RUN chown -R appuser:appuser /app
-RUN chmod -R 755 /app/node_modules
-RUN chmod -R 755 /app/frontend/node_modules
-RUN chmod -R 755 /app/backend/node_modules
+# Create non-root user
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup && \
+    chown -R appuser:appgroup /app
 
 USER appuser
+ENV NODE_ENV=production
+EXPOSE 5000
 
-# Expose ports
-EXPOSE 3000 5000
-
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:5000/health || exit 1
+  CMD wget -q --spider http://localhost:5000/health || exit 1
 
-# Start command
 CMD ["npm", "start"]
