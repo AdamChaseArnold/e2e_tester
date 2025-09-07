@@ -24,11 +24,14 @@ check_service() {
 
 # Check if Docker services are running
 echo "Checking Docker services..."
-if ! docker-compose ps | grep -q "running"; then
+if ! docker-compose ps --services --filter "status=running" | grep -q "."; then
     echo -e "${RED}Docker services are not running${NC}"
     echo "Please start services with: docker-compose up -d"
     exit 1
 fi
+
+# Give services a moment to fully initialize
+sleep 5
 
 # Check backend health
 check_service "Backend health endpoint" "http://localhost:5000/health"
