@@ -1,64 +1,235 @@
 /* App.css - Styles for the Playwright E2E Test Runner */
+/* Modern Corporate Dark Theme UI Design */
 
-/* Additional styles beyond Tailwind CSS */
+/* Import Inter font for a modern corporate look */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Base styles */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #121620; /* Deep charcoal background */
+  color: #e1e6ef; /* Soft light gray text for better readability */
+  line-height: 1.6;
+}
 
 /* Focus styles for accessibility */
 :focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #3a7bd5; /* Bright blue for focus states */
   outline-offset: 2px;
 }
 
-/* Custom animations */
+/* Custom animations with corporate subtlety */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.7; } /* Less dramatic for corporate feel */
 }
 
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Toast animation */
+/* Subtle hover transitions */
+.hover-transition {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Subtle glow effect for dark theme */
+.dark-glow {
+  box-shadow: 0 0 10px rgba(58, 123, 213, 0.1);
+}
+
+.dark-glow-success {
+  box-shadow: 0 0 8px rgba(72, 187, 120, 0.08);
+}
+
+.dark-glow-error {
+  box-shadow: 0 0 10px rgba(229, 62, 62, 0.1);
+}
+
+/* Toast animation - more subtle and professional */
 @keyframes slideIn {
-  from { transform: translateY(100%); opacity: 0; }
+  from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
 [role="alert"] {
   animation: slideIn 0.3s ease-out forwards;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); /* Stronger shadow for dark theme */
 }
 
-/* Code block styling */
+/* Code block styling - more refined for dark theme */
 code {
-  font-family: 'Courier New', Courier, monospace;
-  background-color: #f3f4f6;
-  padding: 0.1rem 0.3rem;
+  font-family: 'SF Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+  background-color: #1e2433;
+  padding: 0.2rem 0.4rem;
   border-radius: 0.25rem;
   font-size: 0.875rem;
+  color: #3a7bd5; /* Match primary color */
+  border: 1px solid rgba(58, 123, 213, 0.2); /* Very subtle border */
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments - maintain corporate look at all sizes */
 @media (max-width: 640px) {
   h1 {
     font-size: 1.5rem;
+    letter-spacing: -0.01em; /* Tighter tracking on small screens */
   }
   
   button {
     width: 100%;
   }
+  
+  .container {
+    padding: 1.5rem !important;
+  }
 }
 
-/* Print styles */
+/* Print styles - optimized for corporate documentation */
 @media print {
   body {
     background-color: white;
+    color: #000;
+    font-size: 12pt;
   }
   
-  .shadow-lg {
+  .shadow-lg, .shadow-md, .shadow-sm {
     box-shadow: none !important;
   }
   
-  button {
+  button, .no-print {
     display: none;
   }
+  
+  .container {
+    border: none !important;
+  }
+  
+  a {
+    color: #000;
+    text-decoration: none;
+  }
+}
+
+/* Corporate Dark Theme UI specific styles */
+.corporate-container {
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  background-color: #1a202e; /* Slightly lighter than main background */
+  border: 1px solid #2a3142; /* Subtle border for depth */
+}
+
+.corporate-header {
+  border-bottom: 1px solid #2a3142;
+  padding-bottom: 1.25rem;
+}
+
+.corporate-input {
+  border: 1px solid #2a3142;
+  background-color: #121620;
+  color: #e1e6ef;
+  transition: all 0.2s;
+}
+
+.corporate-input:focus {
+  border-color: #3a7bd5;
+  box-shadow: 0 0 0 4px rgba(58, 123, 213, 0.15);
+}
+
+.corporate-input::placeholder {
+  color: #6c7793;
+}
+
+.corporate-button {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: all 0.2s;
+}
+
+.corporate-button-primary {
+  background: linear-gradient(to bottom, #3a7bd5, #2b5ca0);
+  border: 1px solid #2b5ca0;
+}
+
+.corporate-button-primary:hover {
+  background: linear-gradient(to bottom, #4a8be5, #3a7bd5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(58, 123, 213, 0.3);
+}
+
+.corporate-success {
+  background-color: #1c2a25;
+  border: 1px solid #2d503c;
+  color: #48bb78;
+}
+
+.corporate-error {
+  background-color: #2d1e24;
+  border: 1px solid #4e2a32;
+  color: #f56565;
+}
+
+.corporate-loading {
+  background-color: #1e2433;
+  border: 1px solid #2a3142;
+  color: #3a7bd5;
+}
+
+.corporate-neutral {
+  background-color: #1e2433;
+  border: 1px solid #2a3142;
+  color: #a0aec0;
+}
+
+.corporate-logo {
+  color: #3a7bd5;
+}
+
+/* Dark theme specific styles */
+.dark-card {
+  background-color: #1a202e;
+  border: 1px solid #2a3142;
+}
+
+.dark-text-primary {
+  color: #e1e6ef;
+}
+
+.dark-text-secondary {
+  color: #a0aec0;
+}
+
+.dark-text-accent {
+  color: #3a7bd5;
+}
+
+.dark-border {
+  border-color: #2a3142;
+}
+
+.dark-bg-elevated {
+  background-color: #1e2433;
+}
+
+.dark-bg-success {
+  background-color: #1c2a25;
+}
+
+.dark-bg-error {
+  background-color: #2d1e24;
+}
+
+.dark-bg-warning {
+  background-color: #2d261e;
+}
+
+.dark-success-text {
+  color: #48bb78;
+}
+
+.dark-error-text {
+  color: #f56565;
+}
+
+.dark-warning-text {
+  color: #ed8936;
 }
